@@ -1,0 +1,278 @@
+# Database Design
+
+## Database
+
+PostgreSQL
+
+## Company
+
+NovaMart
+
+---
+
+# 1. Customers Table
+
+Stores information about NovaMart customers.
+
+| Column | Data Type | Description |
+|---|---|---|
+| customer_id | INTEGER | Unique customer ID |
+| customer_name | VARCHAR(100) | Customer name |
+| email | VARCHAR(150) | Customer email |
+| phone | VARCHAR(20) | Customer phone |
+| city | VARCHAR(100) | Customer city |
+| state | VARCHAR(100) | Customer state |
+| region | VARCHAR(50) | Business region |
+| customer_segment | VARCHAR(50) | Customer segment |
+| registration_date | DATE | Customer registration date |
+
+Primary Key:
+
+customer_id
+
+---
+
+# 2. Products Table
+
+Stores information about products sold by NovaMart.
+
+| Column | Data Type | Description |
+|---|---|---|
+| product_id | INTEGER | Unique product ID |
+| product_name | VARCHAR(150) | Product name |
+| category | VARCHAR(100) | Product category |
+| sub_category | VARCHAR(100) | Product sub-category |
+| unit_price | DECIMAL(12,2) | Product selling price |
+| cost_price | DECIMAL(12,2) | Product cost |
+| supplier | VARCHAR(150) | Supplier name |
+
+Primary Key:
+
+product_id
+
+---
+
+# 3. Orders Table
+
+Stores information about customer orders.
+
+| Column | Data Type | Description |
+|---|---|---|
+| order_id | INTEGER | Unique order ID |
+| customer_id | INTEGER | Customer who placed order |
+| order_date | DATE | Date of order |
+| sales_channel | VARCHAR(50) | Online or Offline |
+| payment_method | VARCHAR(50) | Payment method |
+| order_status | VARCHAR(50) | Order status |
+
+Primary Key:
+
+order_id
+
+Foreign Key:
+
+customer_id → customers.customer_id
+
+---
+
+# 4. Sales Table
+
+Stores individual product sales.
+
+| Column | Data Type | Description |
+|---|---|---|
+| sale_id | INTEGER | Unique sale ID |
+| order_id | INTEGER | Related order |
+| product_id | INTEGER | Product sold |
+| quantity | INTEGER | Quantity sold |
+| unit_price | DECIMAL(12,2) | Selling price |
+| discount | DECIMAL(12,2) | Discount amount |
+| sales_amount | DECIMAL(12,2) | Total sales amount |
+| cost_amount | DECIMAL(12,2) | Total cost |
+| profit | DECIMAL(12,2) | Profit amount |
+
+Primary Key:
+
+sale_id
+
+Foreign Keys:
+
+order_id → orders.order_id
+
+product_id → products.product_id
+
+---
+
+# 5. Employees Table
+
+Stores NovaMart employee information.
+
+| Column | Data Type | Description |
+|---|---|---|
+| employee_id | INTEGER | Unique employee ID |
+| employee_name | VARCHAR(100) | Employee name |
+| department | VARCHAR(100) | Department |
+| job_title | VARCHAR(100) | Job title |
+| state | VARCHAR(100) | Employee state |
+| region | VARCHAR(50) | Business region |
+| joining_date | DATE | Joining date |
+| salary | DECIMAL(12,2) | Salary |
+
+Primary Key:
+
+employee_id
+
+---
+
+# 6. Expenses Table
+
+Stores company expenses.
+
+| Column           | Data Type    | Description        |
+|------------------|--------------|--------------------|
+| expense_id       | INTEGER      | Unique expense ID  |
+| expense_date     | DATE         | Expense date       |
+| expense_category | VARCHAR(100) | Expense category   |
+| description      | VARCHAR(255) | Expense description|
+| amount           | DECIMAL(12,2)| Expense amount     |
+| department       | VARCHAR(100) | Department         |
+| state            | VARCHAR(100) | State              |
+| region           | VARCHAR(50)  | Business region    |
+
+Primary Key:
+
+expense_id
+
+---
+
+# 7. Targets Table
+
+Stores sales targets.
+
+| Column        | Data Type     | Description          |
+|---------------|---------------|----------------------|
+| target_id     | INTEGER       | Unique target ID     |
+| target_month  | DATE          | Target month         |
+| state         | VARCHAR(100)  | State                |
+| region        | VARCHAR(50)   | Business region      |
+| sales_target  | DECIMAL(12,2) | Target sales amount  |
+| profit_target | DECIMAL(12,2) | Target profit amount |
+
+Primary Key:
+
+target_id
+
+---
+
+# Table Relationships
+
+## Customers → Orders
+
+One customer can have many orders.
+
+Relationship:
+
+customers.customer_id
+
+↓
+
+orders.customer_id
+
+One-to-Many
+
+---
+
+## Orders → Sales
+
+One order can contain multiple sales records.
+
+Relationship:
+
+orders.order_id
+
+↓
+
+sales.order_id
+
+One-to-Many
+
+---
+
+## Products → Sales
+
+One product can appear in many sales records.
+
+Relationship:
+
+products.product_id
+
+↓
+
+sales.product_id
+
+One-to-Many
+
+---
+
+# Main Relationship Structure
+
+customers
+     │
+     │ 1
+     │
+     │ many
+     ▼
+orders
+     │
+     │ 1
+     │
+     │ many
+     ▼
+sales
+     ▲
+     │
+     │ many
+     │
+     │ 1
+     │
+products
+
+employees
+expenses
+targets
+
+are independent business-support tables.
+
+---
+
+# Main Analytical Flow
+
+Customers
+    ↓
+Orders
+    ↓
+Sales
+    ↓
+Products
+
+This relationship allows the system to answer questions such as:
+
+"What were the sales of our electronics products?"
+
+"What did a particular customer purchase?"
+
+"What were our sales in Kerala?"
+
+"What was the profit generated by each product?"
+
+---
+
+# Important Design Rule
+
+The Sales table is the central table for sales analysis.
+
+Orders connect customers to purchases.
+
+Products connect sales to products.
+
+Customers provide customer and geographic information.
